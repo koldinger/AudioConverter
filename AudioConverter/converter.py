@@ -230,6 +230,9 @@ def converter(conversion_job: ConversionJob):
     output_name = output_path.joinpath(converted_name)
     parameters = get_parameters(output_format, codec)
 
+    if output_format == "m4a":
+        output_format = "ipod"
+
     audio.export(
         output_name.as_posix(),
         format=output_format,
