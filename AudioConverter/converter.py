@@ -164,13 +164,13 @@ def convert(
         )
         output_path.mkdir(exist_ok=True)
 
-    audio_files = get_audio_files(input_path)
+    audio_files = sorted(get_audio_files(input_path))
     audio_files = [
         ConversionJob(
             output_format=output_format,
             codec=codec,
             verbose=config.verbose,
-            output_path=output_path,
+            output_path=pathlib.Path(output_path, file_path.parent.relative_to(input_path)),
             file_path=file_path,
             logger=logger,
         )
@@ -220,9 +220,12 @@ def converter(conversion_job: ConversionJob):
     audio_name = audio_file.name[: audio_file.name.rfind(".")]
     converted_name = "{}.{}".format(audio_name, output_format)
 
+    output_path.mkdir(exist_ok=True, parents=True)
+
     logger.verbose(
-        "Converting {} to {}".format(audio_name, output_format), verbose_flag
+        "Converting {} to {}".format(audio_file, output_format), verbose_flag
     )
+
     audio = AudioSegment.from_file(audio_file.as_posix(), audio_file.suffix[1:])
     output_name = output_path.joinpath(converted_name)
     parameters = get_parameters(output_format, codec)
